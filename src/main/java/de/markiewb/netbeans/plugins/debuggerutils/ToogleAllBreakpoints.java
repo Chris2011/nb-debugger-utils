@@ -9,6 +9,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import org.netbeans.api.annotations.common.StaticResource;
 import org.netbeans.api.debugger.ActiveBreakpoints;
+import static org.netbeans.api.debugger.ActiveBreakpoints.PROP_BREAKPOINTS_ACTIVE;
 import org.netbeans.api.debugger.DebuggerEngine;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.DebuggerManagerAdapter;
@@ -36,58 +37,40 @@ public final class ToogleAllBreakpoints extends AbstractAction implements Action
     private static final String iconpath_unmuted = "de/markiewb/netbeans/plugins/debuggerutils/Breakpoint_stroke.png";
 
     Icon icon_muted = ImageUtilities.loadImageIcon(iconpath_muted, false);
-    Icon icon_unmuted = ImageUtilities.loadImageIcon(iconpath_muted, false);
-    WeakReference<DebuggerEngine> engine = null;
+    Icon icon_unmuted = ImageUtilities.loadImageIcon(iconpath_unmuted, false);
 
     public ToogleAllBreakpoints() {
-        final AbstractAction action = this;
-        DebuggerManager.getDebuggerManager().addDebuggerListener(DebuggerManager.PROP_CURRENT_ENGINE, new DebuggerManagerAdapter() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                DebuggerEngine de = (DebuggerEngine) evt.getNewValue();
-                engine = new WeakReference<>(de);
-                if (null != de) {
-                    ActiveBreakpoints ab = ActiveBreakpoints.get(de);
-                    if (ab.canDeactivateBreakpoints()) {
-                        if (ab.areBreakpointsActive()) {
-                            action.putValue(Action.SMALL_ICON, icon_muted);
-                            action.putValue(Action.LARGE_ICON_KEY, icon_muted);
-                            action.putValue(Action.SHORT_DESCRIPTION, "Mute all breakpoints");
-                        } else {
-                            action.putValue(Action.SMALL_ICON, icon_unmuted);
-                            action.putValue(Action.LARGE_ICON_KEY, icon_unmuted);
-                            action.putValue(Action.SHORT_DESCRIPTION, "Unmute all breakpoints");
-                        }
-                    }
-                    action.setEnabled(ab.canDeactivateBreakpoints());
-
-                }
-            }
-
-        });
+        setLabel(false);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        DebuggerEngine _engine = DebuggerManager.getDebuggerManager().getCurrentEngine();
         final AbstractAction action = this;
 
-        if (null != engine && null != engine.get()) {
-            ActiveBreakpoints ab = ActiveBreakpoints.get(engine.get());
-            if (ab.canDeactivateBreakpoints()) {
-                if (ab.areBreakpointsActive()) {
-                    action.putValue(Action.SMALL_ICON, icon_muted);
-                    action.putValue(Action.LARGE_ICON_KEY, icon_muted);
-                    action.putValue(Action.SHORT_DESCRIPTION, "Mute all breakpoints");
-                    ab.setBreakpointsActive(false);
-                } else {
-                    action.putValue(Action.SMALL_ICON, icon_unmuted);
-                    action.putValue(Action.LARGE_ICON_KEY, icon_unmuted);
-                    action.putValue(Action.SHORT_DESCRIPTION, "Unmute all breakpoints");
-                    ab.setBreakpointsActive(true);
-                }
-
+        if (null != _engine) {
+            ActiveBreakpoints ab = ActiveBreakpoints.get(_engine);
+            final boolean canDeactivate = ab.canDeactivateBreakpoints();
+            action.setEnabled(canDeactivate);
+            
+            if (canDeactivate) {
+                final boolean active = ab.areBreakpointsActive();
+                ab.setBreakpointsActive(!active);
+                setLabel(active);
             }
-            action.setEnabled(ab.canDeactivateBreakpoints());
+        }
+    }
+
+    public void setLabel(final boolean unmuted) {
+         final AbstractAction action = this;
+        if (unmuted) {
+            action.putValue(Action.SMALL_ICON, icon_muted);
+            action.putValue(Action.LARGE_ICON_KEY, icon_muted);
+            action.putValue(Action.SHORT_DESCRIPTION, "Press to unmute all breakpoints");
+        } else {
+            action.putValue(Action.SMALL_ICON, icon_unmuted);
+            action.putValue(Action.LARGE_ICON_KEY, icon_unmuted);
+            action.putValue(Action.SHORT_DESCRIPTION, "Press to mute all breakpoints");
         }
     }
 }
