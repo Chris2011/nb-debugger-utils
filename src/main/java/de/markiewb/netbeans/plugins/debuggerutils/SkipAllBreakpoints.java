@@ -43,7 +43,7 @@ import org.openide.util.actions.BooleanStateAction;
     @ActionReference(path = "Menu/RunProject", position = 2350)
 }
 )
-@Messages("CTL_SkipAllBreakpoints=Skip all breakpoints")
+@Messages("CTL_SkipAllBreakpoints=Skip all breakpoin&ts")
 /**
  * See
  * http://bits.netbeans.org/dev/javadoc/org-openide-util-ui/org/openide/util/actions/BooleanStateAction.html
