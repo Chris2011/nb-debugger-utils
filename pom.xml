@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.markiewb.netbeans.plugins</groupId>
     <artifactId>DebuggerUtils</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>nbm</packaging>
     <build>
         <plugins>
@@ -32,12 +32,12 @@
                 <configuration>
                     <!-- keep it for backwards compatibility to previous versions-->
                     <codeNameBase>de.markiewb.netbeans.plugins.debuggerutils</codeNameBase>
-                    <!--<licenseFile>LICENSE-2.0.txt</licenseFile>-->
+                    <licenseFile>LICENSE-2.0.txt</licenseFile>
                     <author>Benno Markiewicz (benno.markiewicz@googlemail.com)</author>
                     <homePageUrl>https://github.com/markiewb/nb-debugger-utils</homePageUrl>
                     <keystore>nbproject/private/keystore</keystore>
                     <keystorealias>myself</keystorealias>
-<!--                    <licenseName>Apache 2.0</licenseName>-->
+                    <licenseName>Apache 2.0</licenseName>
                 </configuration>
             </plugin>        
         </plugins>
@@ -86,22 +86,27 @@
         <netbeans.run.params.ide></netbeans.run.params.ide>
         <!--<netbeans.run.params>-J-javaagent:"${current.jrebel.agent.path}" -J-Drebel.log=true ${netbeans.run.params.ide}</netbeans.run.params>-->
         <version>RELEASE81</version>
+        <netbeans.hint.license>apache20</netbeans.hint.license>
     </properties>
-    <name>DebuggerUtils</name>
-    <description>This plugins adds ...
+    <name>DebuggerUtils (f.e. "Skip all breakpoints")</name>
+    <description>This plugins adds a "Skip all breakpoints" toolbar item and menu entry, which allows you to skip all breakpoints of the current debugging session.
+
+&lt;br&gt;
+&lt;img src="https://raw.githubusercontent.com/markiewb/nb-debugger-utils/master/doc/skipbreakpoints.png"&gt;
+&lt;br&gt;
 
 &lt;h2&gt;Changes&lt;/h2&gt;
 &lt;ul&gt;
 	&lt;li&gt;1.0.0
 		&lt;ul&gt;
-                    			&lt;li&gt;Initial version&lt;/li&gt;
+&lt;li&gt;[&lt;a href="https://github.com/markiewb/nb-debugger-utils/issues/1"&gt;Feature 1&lt;/a&gt;] "Skip all breakpoints" action for toolbar and menu entry&lt;/li&gt;
 		&lt;/ul&gt;
 	&lt;/li&gt;
 
 &lt;/ul&gt;
 
 &lt;p&gt;Provide defects, request for enhancements and feedback at &lt;a href="https://github.com/markiewb/nb-debugger-utils/issues"&gt;https://github.com/markiewb/nb-debugger-utils/issues&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Compatible to NB 8.1+&lt;/p&gt;
-&lt;p&gt;Legal disclaimer: Code is licensed under XXX &lt;/p&gt;
+&lt;p&gt;Legal disclaimer: Code is licensed under Apache 2.0 &lt;/p&gt;
 
 &lt;p&gt;
 &lt;a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=K4CMP92RZELE2"&gt;&lt;img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="btn_donate_SM.gif"&gt;&lt;/a&gt;
