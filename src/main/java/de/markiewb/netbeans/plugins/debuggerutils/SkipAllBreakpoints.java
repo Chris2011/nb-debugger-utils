@@ -1,10 +1,8 @@
 package de.markiewb.netbeans.plugins.debuggerutils;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.AbstractAction;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.Action;
-import javax.swing.Icon;
 import org.netbeans.api.annotations.common.StaticResource;
 import org.netbeans.api.debugger.ActiveBreakpoints;
 import org.netbeans.api.debugger.DebuggerEngine;
@@ -15,37 +13,39 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.*;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.actions.BooleanStateAction;
 
 @ActionID(
         category = "Debug",
-        id = "de.markiewb.netbeans.plugins.debuggerutils.ToggleAllBreakpoints"
+        id = "de.markiewb.netbeans.plugins.debuggerutils.SkipAllBreakpoints"
 )
 @ActionRegistration(
-        iconBase = "de/markiewb/netbeans/plugins/debuggerutils/Breakpoint_stroke.png",
-        displayName = "#CTL_ToggleAllBreakpoints"
+        lazy = false,
+        displayName = "#CTL_SkipAllBreakpoints"
 )
 @ActionReferences({
     @ActionReference(path = "Toolbars/Debug", position = 1050),
     @ActionReference(path = "Menu/RunProject", position = 2350)
 }
 )
-@Messages("CTL_ToggleAllBreakpoints=Disable/enable breakpoints")
-public final class ToggleAllBreakpoints extends AbstractAction implements ActionListener {
+@Messages("CTL_SkipAllBreakpoints=Skip all breakpoints")
+/**
+ * See
+ * http://bits.netbeans.org/dev/javadoc/org-openide-util-ui/org/openide/util/actions/BooleanStateAction.html
+ */
+public final class SkipAllBreakpoints extends BooleanStateAction implements PropertyChangeListener {
 
-    @StaticResource
-    private static final String iconpath_unmuted = "de/markiewb/netbeans/plugins/debuggerutils/Breakpoint.png";
     @StaticResource
     private static final String iconpath_muted = "de/markiewb/netbeans/plugins/debuggerutils/Breakpoint_stroke.png";
 
-    Icon icon_muted = ImageUtilities.loadImageIcon(iconpath_muted, false);
-    Icon icon_unmuted = ImageUtilities.loadImageIcon(iconpath_unmuted, false);
+    public SkipAllBreakpoints() {
+        addPropertyChangeListener(this);
 
-    public ToggleAllBreakpoints() {
+        setBooleanState(false);
         setLabel(false);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    public void handleToggle() {
         DebuggerEngine _engine = DebuggerManager.getDebuggerManager().getCurrentEngine();
 
         if (null != _engine) {
@@ -63,16 +63,32 @@ public final class ToggleAllBreakpoints extends AbstractAction implements Action
         }
     }
 
-    public void setLabel(final boolean muted) {
-        final AbstractAction action = this;
-        if (muted) {
-            action.putValue(Action.SMALL_ICON, icon_muted);
-            action.putValue(Action.LARGE_ICON_KEY, icon_muted);
-            action.putValue(Action.SHORT_DESCRIPTION, "[Disabled] Press to skip all breakpoints");
-        } else {
-            action.putValue(Action.SMALL_ICON, icon_unmuted);
-            action.putValue(Action.LARGE_ICON_KEY, icon_unmuted);
-            action.putValue(Action.SHORT_DESCRIPTION, "[Enabled] Press to unskip all breakpoints");
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(PROP_BOOLEAN_STATE)) {
+            handleToggle();
         }
+    }
+
+    public HelpCtx getHelpCtx() {
+        return HelpCtx.DEFAULT_HELP;
+    }
+
+    @Override
+    public String getName() {
+        return Bundle.CTL_SkipAllBreakpoints();
+    }
+
+    public void setLabel(final boolean muted) {
+        if (muted) {
+            putValue(Action.SHORT_DESCRIPTION, "[Disabled] Check to skip all breakpoints");
+        } else {
+            putValue(Action.SHORT_DESCRIPTION, "[Enabled] Uncheck to unskip all breakpoints");
+        }
+    }
+
+    @Override
+    protected String iconResource() {
+        return iconpath_muted;
     }
 }
