@@ -1,3 +1,6 @@
+<hr>
+<h1 style="color: #FF0000">Looking for maintainers, who want to take over the development!</h1>
+<hr>
 This plugins adds a "Skip all breakpoints" toolbar item and menu entry, which allows you to skip all breakpoints of the current debugging session.
 
 <br>
