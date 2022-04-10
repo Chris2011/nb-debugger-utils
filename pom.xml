@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <name>DebuggerUtils (f.e. "Skip all breakpoints")</name>
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.markiewb.netbeans.plugins</groupId>
     <artifactId>DebuggerUtils</artifactId>
@@ -85,17 +86,16 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-modules</artifactId>
-            <version>RELEASE81</version>
+            <version>${version}</version>
         </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide></netbeans.run.params.ide>
         <!--<netbeans.run.params>-J-javaagent:"${current.jrebel.agent.path}" -J-Drebel.log=true ${netbeans.run.params.ide}</netbeans.run.params>-->
-        <version>RELEASE81</version>
+        <version>RELEASE90</version>
         <netbeans.hint.license>apache20</netbeans.hint.license>
     </properties>
-    <name>DebuggerUtils (f.e. "Skip all breakpoints")</name>
     <description>This plugins adds a "Skip all breakpoints" toolbar item and menu entry, which allows you to skip all breakpoints of the current debugging session.
 
 &lt;br&gt;

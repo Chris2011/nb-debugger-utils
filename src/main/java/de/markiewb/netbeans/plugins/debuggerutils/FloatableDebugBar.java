@@ -30,21 +30,19 @@ public final class FloatableDebugBar implements DebuggerManagerListener {
     private Frame mainWindow;
 
     public FloatableDebugBar() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                toolBarWindow = new JDialog();
-                toolBar = new JToolBar();
-                mainWindow = WindowManager.getDefault().getMainWindow();
+        SwingUtilities.invokeLater(() -> {
+            toolBarWindow = new JDialog();
+            toolBar = new JToolBar();
+            mainWindow = WindowManager.getDefault().getMainWindow();
 
-                mainWindow.setVisible(true);
-                mainWindow.getComponent(0).setVisible(true);
+            mainWindow.setVisible(true);
+            mainWindow.getComponent(0).setVisible(true);
 
-                // see http://stackoverflow.com/a/11238100
-                ui = getToolbarUI();
+            // see http://stackoverflow.com/a/11238100
+            ui = getToolbarUI();
 
-                if (null != ui) {
-                    toolBar.setUI(ui);
-                }
+            if (null != ui) {
+                toolBar.setUI(ui);
             }
         });
     }
@@ -99,32 +97,29 @@ public final class FloatableDebugBar implements DebuggerManagerListener {
 
     @Override
     public void sessionAdded(final Session sn) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                actionsForPath = org.openide.util.Utilities.actionsForPath("Toolbars/Debug");
-                // see http://wiki.netbeans.org/DevFaqInvokeActionProgrammatically
-                List<Action> actionsForToolbar = new ArrayList<>();
+        SwingUtilities.invokeLater(() -> {
+            actionsForPath = org.openide.util.Utilities.actionsForPath("Toolbars/Debug");
+            // see http://wiki.netbeans.org/DevFaqInvokeActionProgrammatically
+            List<Action> actionsForToolbar = new ArrayList<>();
 
-                if (sn != null) {
-                    for (Action action : actionsForPath) {
-                        // INFO: http://wiki.netbeans.org/DevFaqAddIconToContextMenu
-                        action.putValue(SMALL_ICON, ImageUtilities.loadImageIcon((String) action.getValue("iconBase"), false));
-                        action.putValue("iconBase", (String) action.getValue("iconBase"));
+            if (sn != null) {
+                for (Action action : actionsForPath) {
+                    // INFO: http://wiki.netbeans.org/DevFaqAddIconToContextMenu
+                    action.putValue(SMALL_ICON, ImageUtilities.loadImageIcon((String) action.getValue("iconBase"), false));
+                    action.putValue("iconBase", (String) action.getValue("iconBase"));
 
-                        actionsForToolbar.add(action);
-                    }
+                    actionsForToolbar.add(action);
+                }
 
-                    for (Action action : actionsForToolbar) {
-                        toolBar.add(action);
-                    }
+                for (Action action : actionsForToolbar) {
+                    toolBar.add(action);
+                }
 
 //            mainWindow.add(toolBar);
 //                    mainWindow.setVisible(true);
 //                    mainWindow.getComponent(0).setVisible(true);
-                    // now you can set the toolbar floating
+// now you can set the toolbar floating
 //                    ui.setFloating(true, new Point(0, 0));
-                }
             }
         });
     }
