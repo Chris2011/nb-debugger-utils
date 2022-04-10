@@ -85,6 +85,7 @@ public final class SkipAllBreakpoints extends BooleanStateAction implements Prop
         }
     }
 
+    @Override
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
     }
