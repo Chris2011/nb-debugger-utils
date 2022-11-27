@@ -1,68 +1,76 @@
 package de.markiewb.netbeans.plugins.debuggerutils;
 
+import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Point;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
 import static javax.swing.Action.SMALL_ICON;
-import javax.swing.JDialog;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicToolBarUI;
+import javax.swing.border.EmptyBorder;
+import org.netbeans.api.annotations.common.StaticResource;
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerEngine;
 import org.netbeans.api.debugger.DebuggerManagerListener;
 import org.netbeans.api.debugger.Session;
 import org.netbeans.api.debugger.Watch;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.windows.WindowManager;
 
-public final class FloatableDebugBar implements DebuggerManagerListener {
+public final class FloatableDebugBar implements DebuggerManagerListener, MouseListener, MouseMotionListener {
 
     private List<? extends Action> actionsForPath;
-    private JDialog toolBarWindow;
     private JToolBar toolBar;
-    private BasicToolBarUI ui;
+    private JFrame floatableToolbarWindow;
+    private ShadowPane shadowPane;
     private Frame mainWindow;
+    private JLabel lblDraggable;
 
+    @StaticResource
+    private static final String dragIcon = "de/markiewb/netbeans/plugins/debuggerutils/dragIcon_20.png";
+
+    // see http://stackoverflow.com/a/11238100
     public FloatableDebugBar() {
         SwingUtilities.invokeLater(() -> {
-            toolBarWindow = new JDialog();
             toolBar = new JToolBar();
-            mainWindow = WindowManager.getDefault().getMainWindow();
+            floatableToolbarWindow = new JFrame();
+            shadowPane = new ShadowPane();
+//            lblDraggable = new JLabel(new ImageIcon(dragIcon));
+            lblDraggable = new JLabel("dragicon");
 
-            mainWindow.setVisible(true);
-            mainWindow.getComponent(0).setVisible(true);
+            floatableToolbarWindow.setResizable(true);
+//            floatableToolbarWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            floatableToolbarWindow.setUndecorated(false);
+//            floatableToolbarWindow.setBackground(new Color(255, 0, 0, 0));
+//            floatableToolbarWindow.setLocation(250, 250);
 
-            // see http://stackoverflow.com/a/11238100
-            ui = getToolbarUI();
+            lblDraggable.setSize(16, 16);
+            lblDraggable.setLayout(new BorderLayout());
+//            lblDraggable.setOpaque(false);
+//            lblDraggable.setHorizontalAlignment(JLabel.CENTER);
+//            lblDraggable.setBorder(new EmptyBorder(10, 10, 10, 10));
+            lblDraggable.setBorder(BorderFactory.createLineBorder(Color.black));
+            lblDraggable.setIconTextGap(5);
+            toolBar.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-            if (null != ui) {
-                toolBar.setUI(ui);
-            }
+//            floatableToolbarWindow.setContentPane(shadowPane);
+//            toolBar.add(lblDraggable);
+            toolBar.setFloatable(false);
         });
-    }
-
-    private BasicToolBarUI getToolbarUI() {
-        // get UI from LAF
-        String classOfToolbarUI = UIManager.getString("ToolBarUI");
-
-        try {
-            Class<?> clazz = Class.forName(classOfToolbarUI);
-            Object newInstance = clazz.newInstance();
-
-            if (newInstance instanceof BasicToolBarUI) {
-                return (BasicToolBarUI) newInstance;
-            }
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-
-        return null;
     }
 
     @Override
@@ -102,6 +110,7 @@ public final class FloatableDebugBar implements DebuggerManagerListener {
             // see http://wiki.netbeans.org/DevFaqInvokeActionProgrammatically
             List<Action> actionsForToolbar = new ArrayList<>();
 
+            toolBar.add(lblDraggable);
             if (sn != null) {
                 for (Action action : actionsForPath) {
                     // INFO: http://wiki.netbeans.org/DevFaqAddIconToContextMenu
@@ -115,22 +124,26 @@ public final class FloatableDebugBar implements DebuggerManagerListener {
                     toolBar.add(action);
                 }
 
-//            mainWindow.add(toolBar);
-//                    mainWindow.setVisible(true);
-//                    mainWindow.getComponent(0).setVisible(true);
-// now you can set the toolbar floating
-//                    ui.setFloating(true, new Point(0, 0));
+//                floatableToolbarWindow.add(lblDraggable);
+                floatableToolbarWindow.add(toolBar);
+                floatableToolbarWindow.pack();
+                floatableToolbarWindow.setVisible(true);
+
+                mainWindow = WindowManager.getDefault().getMainWindow();
+
+                floatableToolbarWindow.setLocation((int) (mainWindow.getWidth() / 2.5), mainWindow.getLocation().y);
+
+//                JOptionPane.showMessageDialog(null, "X: " + mainWindow.getLocation().x + " & Y: " + mainWindow.getLocation().y);
+//                shadowPane.setDimension(floatableToolbarWindow.getWidth(), floatableToolbarWindow.getHeight());
             }
         });
     }
 
     @Override
     public void sessionRemoved(Session sn) {
-//        toolBarWindow.setVisible(false);
         toolBar.removeAll();
-//        toolBarWindow.removeAll();
-        mainWindow.remove(toolBar);
-        ui.setFloating(true, new Point(0, 0));
+        floatableToolbarWindow.remove(toolBar);
+        floatableToolbarWindow.setVisible(false);
     }
 
     @Override
@@ -143,5 +156,74 @@ public final class FloatableDebugBar implements DebuggerManagerListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private class ShadowPane extends JPanel {
+
+        private int width = 0;
+        private int height = 0;
+
+        public ShadowPane() {
+//            super(new GridBagLayout());
+
+            setLayout(new BorderLayout());
+            setOpaque(false);
+            setBackground(Color.YELLOW);
+            setBorder(new EmptyBorder(10, 10, 10, 10));
+        }
+
+        public void setDimension(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(200, 200);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setComposite(AlphaComposite.SrcOver.derive(0.5f));
+            g2d.fillRect(10, 10, getWidth(), getHeight());
+            g2d.dispose();
+        }
     }
 }
