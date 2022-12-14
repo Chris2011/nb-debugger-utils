@@ -7,6 +7,6 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         DebuggerManager dm = DebuggerManager.getDebuggerManager();
-        dm.addDebuggerListener(new FloatableDebugBar());
+        dm.addDebuggerListener(new FloatableDebugBarSideBarFactory());
     }
 }

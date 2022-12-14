@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
+OpenIDE-Module-Layer: de/markiewb/netbeans/plugins/debuggerutils/layer.xml
 OpenIDE-Module-Localizing-Bundle: de/markiewb/netbeans/plugins/debuggerutils/Bundle.properties
 OpenIDE-Module-Install: de/markiewb/netbeans/plugins/debuggerutils/Installer.class
